@@ -1,12 +1,17 @@
 var map = document.getElementById("map")
 var ctx = map.getContext("2d");
 var block = 50;
-var tails = 19;
+var tails = 39;
+var camOffsetsX = 0;
+var camOffsetsY = 0;
+var blockOffsetsX = 0;
+var blockOffsetsY = 0;
 var playerIron = 0;
 var playerCopper = 0;
 var inventoryX = 500;
 var inventoryY = 350;
-var ironOreNumber = 5;
+var ironOreNumber = 15;
+var copperOreNumber = 5;
 var yOffsets = 0;
 var gamePause = false;
 var inventoryOpen = false;
@@ -59,9 +64,11 @@ $("#map").click(function(event) { //click detector
 	playerCopper = 0;
 	var clickX = Math.floor(event.pageX/block);
 	var clickY = Math.floor(event.pageY/block);
+	blockOffsetsX = Math.floor(camOffsetsX / block);
+	blockOffsetsY = Math.floor(camOffsetsY / block);
 	if (gamePause === false && inventoryOpen === false) {	
 		if (Math.abs(clickX - player.x / block) <= 3 && Math.abs(clickY - player.y / block) <= 3) {
-			inventoryPlayer.push((blockMapX[clickX])[clickY]);
+			inventoryPlayer.push((blockMapX[clickX + blockOffsetsX])[clickY + blockOffsetsY]);
 			for (var i = 0; i < inventoryPlayer.length; i++) {
 				if (inventoryPlayer[i] === "iron") {
 					playerIron++;
@@ -79,17 +86,33 @@ $("#map").click(function(event) { //click detector
 $("body").keydown(function(event) { //keybord detector
 	if (gamePause === false) {
 		switch(event.keyCode) {
-			case 68: 
-				player.x = player.x+ 10;
+			case 68:
+				if (player.x > block * 34 + block/2) {
+					camOffsetsX = camOffsetsX + 10;
+				} else {
+					player.x = player.x + 10;
+				};
 				break;
 			case 83:
-				player.y =  player.y + 10;
+				if (player.y > block * 16) {
+					camOffsetsY = camOffsetsY + 10;
+				} else {
+					player.y = player.y + 10;
+				};
 				break;
 			case 65:
-				player.x =  player.x- 10;
+				if (player.x < block*3) {
+					camOffsetsX = camOffsetsX - 10;
+				} else {
+					player.x = player.x - 10;
+				};
 				break;
 			case 87:
-				player.y =  player.y- 10;
+				if (player.y < block * 2) {
+					camOffsetsY = camOffsetsY - 10;
+				} else {
+					player.y = player.y - 10;
+				};
 				break;
 			case 32:
 				if (inventoryOpen === false) {
@@ -98,6 +121,7 @@ $("body").keydown(function(event) { //keybord detector
 					inventoryOpen = false;
 				};
 		};
+		// console.log(camOffsetsX + "|" +camOffsetsY);
 	};
 	if (event.keyCode === 69) {
 		if (gamePause === false) {
@@ -212,23 +236,26 @@ var oreGenerator = function(name) {
 };
 var mapBilder = function() {
 	var xOffsets = 0;
+	blockOffsetsX = Math.floor(camOffsetsX / block);
+	blockOffsetsY = Math.floor(camOffsetsY / block);
+
 	for (var i = 0; i < tails*2; i++) {
 		for(var o = 0; o < tails; o++) {
 			if ((blockMapX[xOffsets])[o] === "grass") {
 				ctx.fillStyle = "ForestGreen ";
-				ctx.fillRect(xOffsets*block, o*block, block, block);
+				ctx.fillRect((xOffsets - blockOffsetsX)*block - camOffsetsX - blockOffsetsX, (o - blockOffsetsY) * block - camOffsetsY - blockOffsetsY, block, block);
 			} else if ((blockMapX[xOffsets])[o] === "rock") {
 				ctx.fillStyle = "LightSlateGrey";
-				ctx.fillRect(xOffsets*block, o*block, block, block);
+				ctx.fillRect((xOffsets - blockOffsetsX)*block - camOffsetsX - blockOffsetsX, (o - blockOffsetsY) * block - camOffsetsY - blockOffsetsY, block, block);
 			} else if ((blockMapX[xOffsets])[o] === "sand") {
 				ctx.fillStyle = "Gold";
-				ctx.fillRect(xOffsets*block, o*block, block, block);
+				ctx.fillRect((xOffsets - blockOffsetsX)*block - camOffsetsX - blockOffsetsX, (o - blockOffsetsY) * block - camOffsetsY - blockOffsetsY, block, block);
 			} else if ((blockMapX[xOffsets])[o] === "iron") {
 				ctx.fillStyle = "#61666A";
-				ctx.fillRect(xOffsets*block, o*block, block, block);
+				ctx.fillRect((xOffsets - blockOffsetsX)*block - camOffsetsX - blockOffsetsX, (o - blockOffsetsY) * block - camOffsetsY - blockOffsetsY, block, block);
 			} else if ((blockMapX[xOffsets])[o] === "copper") {
 				ctx.fillStyle = "#b87333";
-				ctx.fillRect(xOffsets*block, o*block, block, block);
+				ctx.fillRect((xOffsets - blockOffsetsX)*block - camOffsetsX - blockOffsetsX, (o - blockOffsetsY) * block - camOffsetsY - blockOffsetsY, block, block);
 			};
 		};
 	xOffsets++;
@@ -238,7 +265,9 @@ mapGenerator();
 for (var i = 0; i < ironOreNumber; i++) {
 	oreGenerator("iron");
 };
-oreGenerator("copper");
+for (var i = 0; i < copperOreNumber; i++) {
+	oreGenerator("copper");
+};
 setInterval(function() {
 	if (gamePause === false) {
 		mapBilder();
