@@ -16,6 +16,8 @@ var yOffsets = 0;
 var gamePause = false;
 var inventoryOpen = false;
 var inventoryMap = {};
+var playerOffsetsX = 0;
+var playerOffsetsY = 0;
 var p = 0;
 var circle = function(color, x, y, radius) {
 	ctx.beginPath();
@@ -62,8 +64,8 @@ player.inventory = {
 $("#map").click(function(event) { //click detector
 	playerIron = 0;
 	playerCopper = 0;
-	var clickX = Math.floor(event.pageX/block);
-	var clickY = Math.floor(event.pageY/block);
+	var clickX = Math.floor((event.pageX + playerOffsetsX)/block);
+	var clickY = Math.floor((event.pageY + playerOffsetsY)/block);
 	blockOffsetsX = Math.floor(camOffsetsX / block);
 	blockOffsetsY = Math.floor(camOffsetsY / block);
 	if (gamePause === false && inventoryOpen === false) {	
@@ -238,24 +240,27 @@ var mapBilder = function() {
 	var xOffsets = 0;
 	blockOffsetsX = Math.floor(camOffsetsX / block);
 	blockOffsetsY = Math.floor(camOffsetsY / block);
-
+	playerOffsetsX = camOffsetsX - Math.floor(camOffsetsX / block) * block;
+	playerOffsetsY = camOffsetsY - Math.floor(camOffsetsY / block) * block;
+	// console.log(playerOffsetsX + "X|Y" + playerOffsetsY + "playerOffsets");
+	// console.log(blockOffsetsX + "X|Y" + blockOffsetsY + "blockOffsets");
 	for (var i = 0; i < tails*2; i++) {
 		for(var o = 0; o < tails; o++) {
 			if ((blockMapX[xOffsets])[o] === "grass") {
 				ctx.fillStyle = "ForestGreen ";
-				ctx.fillRect((xOffsets - blockOffsetsX)*block - camOffsetsX - blockOffsetsX, (o - blockOffsetsY) * block - camOffsetsY - blockOffsetsY, block, block);
+				ctx.fillRect((xOffsets - blockOffsetsX)*block - playerOffsetsX, (o - blockOffsetsY) * block - playerOffsetsY, block, block);
 			} else if ((blockMapX[xOffsets])[o] === "rock") {
 				ctx.fillStyle = "LightSlateGrey";
-				ctx.fillRect((xOffsets - blockOffsetsX)*block - camOffsetsX - blockOffsetsX, (o - blockOffsetsY) * block - camOffsetsY - blockOffsetsY, block, block);
+				ctx.fillRect((xOffsets - blockOffsetsX)*block - playerOffsetsX, (o - blockOffsetsY) * block - playerOffsetsY, block, block);
 			} else if ((blockMapX[xOffsets])[o] === "sand") {
 				ctx.fillStyle = "Gold";
-				ctx.fillRect((xOffsets - blockOffsetsX)*block - camOffsetsX - blockOffsetsX, (o - blockOffsetsY) * block - camOffsetsY - blockOffsetsY, block, block);
+				ctx.fillRect((xOffsets - blockOffsetsX)*block - playerOffsetsX, (o - blockOffsetsY) * block - playerOffsetsY, block, block);
 			} else if ((blockMapX[xOffsets])[o] === "iron") {
 				ctx.fillStyle = "#61666A";
-				ctx.fillRect((xOffsets - blockOffsetsX)*block - camOffsetsX - blockOffsetsX, (o - blockOffsetsY) * block - camOffsetsY - blockOffsetsY, block, block);
+				ctx.fillRect((xOffsets - blockOffsetsX)*block - playerOffsetsX, (o - blockOffsetsY) * block - playerOffsetsY, block, block);
 			} else if ((blockMapX[xOffsets])[o] === "copper") {
 				ctx.fillStyle = "#b87333";
-				ctx.fillRect((xOffsets - blockOffsetsX)*block - camOffsetsX - blockOffsetsX, (o - blockOffsetsY) * block - camOffsetsY - blockOffsetsY, block, block);
+				ctx.fillRect((xOffsets - blockOffsetsX)*block - playerOffsetsX, (o - blockOffsetsY) * block - playerOffsetsY, block, block);
 			};
 		};
 	xOffsets++;
@@ -277,4 +282,4 @@ setInterval(function() {
 	if (inventoryOpen === true) {
 		inventory();
 	};
-},32);
+},16);
