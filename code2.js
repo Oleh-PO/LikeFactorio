@@ -2,20 +2,20 @@ var map = document.getElementById("map")
 var ctx = map.getContext("2d");
 var block = 50;
 var tails = 39;
+var inventorySelect;
 var camOffsetsX = 0;
 var camOffsetsY = 0;
 var blockOffsetsX = 0;
 var blockOffsetsY = 0;
-var playerIron = 0;
-var playerCopper = 0;
 var inventoryX = 500;
 var inventoryY = 350;
 var ironOreNumber = 15;
 var copperOreNumber = 5;
 var yOffsets = 0;
+var oreSelector;
 var gamePause = false;
 var inventoryOpen = false;
-var inventoryMap = {};
+// var inventoryMap = {};
 var playerOffsetsX = 0;
 var playerOffsetsY = 0;
 var p = 0;
@@ -27,6 +27,7 @@ var circle = function(color, x, y, radius) {
 	ctx.fill();
 	ctx.stroke();
 };
+var ore = ["copper", "iron",];
 // circle("#b87333", 100, 100, block/2);
 var random75 = function() { //3/4 random chands
 	var tree = Math.floor(Math.random()*4+1);
@@ -50,37 +51,63 @@ var keys = {
 	65 : "A",
 	87 : "W",
 	69 : "E",
-}
-var inventoryPlayer = [];
+};
 var player = {
 	color : "DarkRed",
 	x : 950,
 	y : 500,
 };
-player.inventory = {
-	iron : 0,
-	copper : 0,
-};
+player.inventory = {};
+player.inventory[1] = ["iron" ,1];
+player.inventory[1] = ["iron" ,1];
+player.inventory[2] = ["copper" ,1];
+player.inventory[3] = ["copper" ,1];
+player.inventory[4] = ["copper" ,1];
+player.inventory[5] = ["copper" ,1];
+player.inventory[6] = ["copper" ,1];
+player.inventory[7] = ["copper" ,1];
+player.inventory[8] = ["copper" ,1];
+player.inventory[9] = ["copper" ,1];
+player.inventory[10] = ["copper" ,1];
+player.inventory[11] = ["copper" ,1];
+
+// player.inventory[0] = ["iron"];
 $("#map").click(function(event) { //click detector
-	playerIron = 0;
-	playerCopper = 0;
 	var clickX = Math.floor((event.pageX + playerOffsetsX)/block);
 	var clickY = Math.floor((event.pageY + playerOffsetsY)/block);
 	blockOffsetsX = Math.floor(camOffsetsX / block);
 	blockOffsetsY = Math.floor(camOffsetsY / block);
 	if (gamePause === false && inventoryOpen === false) {	
 		if (Math.abs(clickX - player.x / block) <= 3 && Math.abs(clickY - player.y / block) <= 3) {
-			inventoryPlayer.push((blockMapX[clickX + blockOffsetsX])[clickY + blockOffsetsY]);
-			for (var i = 0; i < inventoryPlayer.length; i++) {
-				if (inventoryPlayer[i] === "iron") {
-					playerIron++;
-				} else if (inventoryPlayer[i] === "copper") {
-					playerCopper++;
+			for (var i = 0; i < ore.length; i++) {
+				if ((blockMapX[clickX + blockOffsetsX])[clickY + blockOffsetsY] === ore[i]) {
+					oreSelector = ore[i];
+					var o = false;
+					var u = 0;
+					while (o !== true) {
+						if (player.inventory[u] === undefined) {
+							player.inventory[u] = [oreSelector ,1];
+							o = true;
+						} else if (player.inventory[u][0] === oreSelector) {
+							player.inventory[u] = [oreSelector ,player.inventory[u][1] + 1];
+							o = true;
+						} else if (u > 100) {
+							o = true;
+						};
+						u++;
+					};
 				};
 			};
-			player.inventory = {
-				iron : playerIron,
-				copper : playerCopper,
+		};
+	} else if (gamePause === false) {
+		clickX = event.pageX;
+		clickY = event.pageY;
+		if (clickX > inventoryX && clickX < inventoryX + 900) {
+			if (clickX > inventoryY && clickY < inventoryY + 250) {
+				var blockClickX = Math.floor((clickX - inventoryX) / block);
+				var blockClickY = Math.floor((clickY - inventoryY) / block);
+				inventorySelect = blockClickX + blockClickY * 10;
+				console.log(player.inventory[inventorySelect]);
 			};
 		};
 	};
@@ -89,7 +116,7 @@ $("body").keydown(function(event) { //keybord detector
 	if (gamePause === false) {
 		switch(event.keyCode) {
 			case 68:
-				if (player.x > block * 34 + block/2) {
+				if (player.x > block * 24 + block/2) {
 					camOffsetsX = camOffsetsX + 10;
 				} else {
 					player.x = player.x + 10;
@@ -123,7 +150,6 @@ $("body").keydown(function(event) { //keybord detector
 					inventoryOpen = false;
 				};
 		};
-		// console.log(camOffsetsX + "|" +camOffsetsY);
 	};
 	if (event.keyCode === 69) {
 		if (gamePause === false) {
@@ -147,7 +173,6 @@ var tailsRandom = function() { //random map generator
 	};
 };
 var inventory = function() { //inventory criator
-	var inventoryMap = {};
 	var xOffsets = 0;
 	var yOffsets = 0;
 	ctx.fillStyle = "LightGray";
@@ -163,37 +188,29 @@ var inventory = function() { //inventory criator
 			xOffsets = 0;
 		};
 	};
-	if (inventoryPlayer.length > 0) {
-		if (player.inventory.iron > 0 || player.inventory.copper > 0) {
-			for (var i = 0; inventoryMap[i] !== undefined; i++) {};
-			inventoryMap[i] = ["iron" , player.inventory["iron"]];
-			inventoryMap[i+1] = ["copper" , player.inventory["copper"]];
+	xOffsets = 0;
+	yOffsets = 0;
+	for (var i = 0; i < 90; i++) {
+		// console.log(xOffsets + "X|Y" + yOffsets);
+		if (player.inventory[i][0] === "iron" && player.inventory[i][1] > 0) {
+		circle("#61666A", inventoryX + block/2 + block*xOffsets, inventoryY + block/2 + block * yOffsets, block/3);
+		ctx.fillStyle = "Black";
+		ctx.font = "25px Arial";
+		ctx.fillText(player.inventory[i][1], inventoryX + block/1.90 + block*xOffsets,  inventoryY + block + block * yOffsets);
+		} else if (player.inventory[i][0] === "copper" && player.inventory[i][1] > 0) {
+		circle("#b87333", inventoryX + block/2 + block*xOffsets, inventoryY + block/2 + block * yOffsets, block/3);
+		ctx.fillStyle = "Black";
+		ctx.font = "25px Arial";
+		ctx.fillText(player.inventory[i][1], inventoryX + block/1.90 + block*xOffsets,  inventoryY + block + block * yOffsets);
+		};
+		if (xOffsets === 9) {
+			yOffsets++;
+			xOffsets = 0;
+		} else {
+			xOffsets++;
 		};
 	};
-	for (var i = 0; i < 50; i++) {
-		var o = 0;
-		if (o === 9) {
-			p ++;
-			o = 0;
-		}
-		if (inventoryMap[i][0] === "iron" && inventoryMap[i][1] !== 0) {
-			circle("#61666A", inventoryX + block/2 + block*i, inventoryY + block/2, block/3);
-			ctx.fillStyle = "Black";
-			ctx.font = "25px Arial";
-			ctx.fillText(inventoryMap[i][1], inventoryX + block/1.90 + block*i,  inventoryY + block);
-		} else if (inventoryMap[i][0] === "copper" && inventoryMap[i][1] !== 0) {
-			circle("#b87333", inventoryX + block/2 + block*i, inventoryY + block/2, block/3);
-			ctx.fillStyle = "Black";
-			ctx.font = "25px Arial";
-			ctx.fillText(inventoryMap[i][1], inventoryX + block/1.90 + block*i,  inventoryY + block);
-		} else if (inventoryMap[i][1] !== 0) {
-			circle("Black", inventoryX + block/2 + block*i, inventoryY + block/2, block/3);
-			ctx.fillStyle = "Black";
-			ctx.font = "25px Arial";
-			ctx.fillText(inventoryMap[i][1], inventoryX + block/1.90 + block*i,  inventoryY + block);
-		};
-		o++;
-	};
+	// circle("#b87333", inventoryX + block/2 + block*i, inventoryY + block/2, block/3);
 };
 var mapGenerator =  function() {
 	for (var i = 0; i < tails*2; i++) {
