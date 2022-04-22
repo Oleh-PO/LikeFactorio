@@ -17,19 +17,23 @@
 		var block = 100;
 		var x = 0;
 		var y = 0;
+		var RayX = 0;
+		var RayY = 0;
 		var arc = 360;
 		var l = 0;
-		var degry = 15;
+		var degry = 5;
 		var offset = 0;
 		var circleF = {
-			coordinateX : block * 2,
-			coordinateY : block * 2,
-		}
+			coordinateX : 200,
+			coordinateY : 200,
+		};
+		var mapX = 0;
+		var mapY = 0;
 		var map = {
 			0 : ["#","#","#","#","#","#","#",],
 			1 : ["#","_","_","_","_","_","#",],
-			2 : ["#","_","_","_","_","_","#",],
-			3 : ["#","_","_","_","_","_","#",],
+			2 : ["#","_","_","#","_","_","#",],
+			3 : ["#","_","_","#","_","_","#",],
 			4 : ["#","_","_","_","_","_","#",],
 			5 : ["#","#","#","#","#","#","#",],
 		};
@@ -41,49 +45,94 @@
 			ctx.fill();
 			ctx.stroke();
 		};
-		for (var i = 0; i < 6 * map[0].length; i++) {
-			if (map[y][x] === "#") {
-				ctx.fillStyle = "Black";
-				ctx.fillRect(x * block, y * block, block, block);
-				ctx.fillStyle = "Red";
-				ctx.fillRect(0, 0, 10, 10);
-			};
-			if (x === map[0].length - 1) {
-				y++
-				x = 0;
-			} else{
-				x++;
+		var render = function() {
+			x = 0;
+			y = 0;
+			for (var i = 0; i < 6 * map[0].length; i++) {
+				if (map[y][x] === "#") {
+					ctx.fillStyle = "Black";
+					ctx.fillRect(x * block, y * block, block, block);
+					ctx.fillStyle = "Red";
+					ctx.fillRect(0, 0, 10, 10);
+				};
+				if (x === map[0].length - 1) {
+					y++
+					x = 0;
+				} else{
+					x++;
+				};
 			};
 		};
-		// console.log((block / 2) / (1 + Math.tan(l * Math.PI / 180)));
+		
 		$("#map").click(function(event) {
 			console.log((event.pageX) + "X|Y" + (event.pageY));
+			ctx.clearRect(0, 0, 1000, 1000);
+			// render();
+			// circle("#61666A", circleF.coordinateX, circleF.coordinateY, block/2);
+			// rayCast();
 		});
-		circle("#61666A", circleF.coordinateX, circleF.coordinateY, block/2);
-		
+		// circle("#61666A", circleF.coordinateX, circleF.coordinateY, block/2);
 		var rayCast = function() {
 			ctx.strokeStyle = "Red";
-			ctx.lineWidth = 1;
+			ctx.lineWidth = 2;
 			offset  = 0;
-			for (var i = 0; i < arc / degry * 2; i++) {
-				// y = (block / 2) / (1 + Math.tan((l) * Math.PI / 180));
-				// x = Math.sqrt((block/2)*(block/2) - (y * y));
-				y = Math.sqrt(Math.pow(block / 2 , 2) / (1 + Math.pow(Math.tan((l) * Math.PI / 180), 2)));
-				x = Math.sqrt((block/2)*(block/2) - (y * y));
+			for (var i = 0; i < arc / degry; i++) {
+				y = Math.sqrt(Math.pow(block / 5 , 2) / (1 + Math.pow(Math.tan((l) * Math.PI / 180), 2)));
+				x = Math.sqrt((block/5)*(block/5) - (y * y));
 				ctx.beginPath();
 				ctx.moveTo(circleF.coordinateX, circleF.coordinateY);
-				console.log(l);
+				RayY = Math.sqrt(Math.pow(10, 2) / (1 + Math.pow(Math.tan((l) * Math.PI / 180), 2)));
+				RayX = Math.sqrt(Math.pow(10, 2) - Math.pow(RayY, 2));
+
 				if (offset === 0) {
 					ctx.lineTo((circleF.coordinateX + x), (circleF.coordinateY + y));
+					for (var o = 0; o < 20; o++) {
+						mapY = Math.floor((circleF.coordinateY + RayY + y) / block);
+						mapX = Math.floor((circleF.coordinateX + RayX + x) / block);
+						if ((map[mapY])[mapX] === "_") {
+							// ctx.lineTo((circleF.coordinateX + RayX + x), (circleF.coordinateY + RayY + y));
+							x = x + RayX;
+							y = y + RayY;
+						};
+					};
+					// console.log(x + "X|Y" + y);
+					console.log(Math.sqrt(x * x + y * y) - block/5);
 				} else if (offset === 1) {
 					ctx.strokeStyle = "blue";
 					ctx.lineTo((circleF.coordinateX + y), (circleF.coordinateY - x));
+					for (var o = 0; o < 20; o++) {
+						mapY = Math.floor((circleF.coordinateY - RayX - x) / block);
+						mapX = Math.floor((circleF.coordinateX + RayY + y) / block);
+						if ((map[mapY])[mapX] === "_") {
+							ctx.lineTo((circleF.coordinateX + RayY + y), (circleF.coordinateY - RayX - x));
+							x = x + RayX;
+							y = y + RayY;
+						};
+					};
 				} else if (offset === 2) {
 					ctx.strokeStyle = "green";
 					ctx.lineTo((circleF.coordinateX - x), (circleF.coordinateY - y));
+					for (var o = 0; o < 20; o++) {
+						mapY = Math.floor((circleF.coordinateY - RayY - y) / block);
+						mapX = Math.floor((circleF.coordinateX - RayX - x) / block);
+						if ((map[mapY])[mapX] === "_") {
+							ctx.lineTo((circleF.coordinateX - RayX - x), (circleF.coordinateY - RayY - y));
+							x = x + RayX;
+							y = y + RayY;
+						};
+					};
 				} else if (offset === 3) {
 					ctx.strokeStyle = "yellow";
 					ctx.lineTo((circleF.coordinateX - y), (circleF.coordinateY + x));
+					for (var o = 0; o < 20; o++) {
+						mapY = Math.floor((circleF.coordinateY + RayX + x) / block);
+						mapX = Math.floor((circleF.coordinateX - RayY - y) / block);
+						if ((map[mapY])[mapX] === "_") {
+							ctx.lineTo((circleF.coordinateX - RayY - y), (circleF.coordinateY + RayX + x));
+							x = x + RayX;
+							y = y + RayY;
+						};
+					};
 				};
 				ctx.stroke();
 				l = l + degry;
@@ -93,7 +142,28 @@
 				};	
 			};
 		};
-		rayCast();
+		$("body").keydown(function(event) { //keybord detector
+				switch(event.keyCode) {
+					case 68:
+						 circleF.coordinateX = circleF.coordinateX + 10;
+						break;
+					case 83:
+						 circleF.coordinateY = circleF.coordinateY + 10;
+						break;
+					case 65:
+						 circleF.coordinateX = circleF.coordinateX - 10;
+						break;
+					case 87:
+						 circleF.coordinateY = circleF.coordinateY - 10;
+						break;
+					};
+		});
+		 setInterval(function() {
+		 	ctx.clearRect(0, 0, 1000, 1000);
+			render();
+			circle("#61666A", circleF.coordinateX, circleF.coordinateY, block/5);
+			rayCast();
+		},16)
 	</script>
 </body>
 </html>
