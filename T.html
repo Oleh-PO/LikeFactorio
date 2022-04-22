@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>LikeFactorio</title>
+</head>
+<body>
+	<canvas id="map" width="700" height="700"></canvas>
+	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+	<style type="text/css">
+		body {
+			margin: 0;
+		}
+	</style>
+	<script>
+		var map = document.getElementById("map")
+		var ctx = map.getContext("2d");
+		var block = 100;
+		var x = 0;
+		var y = 0;
+		var arc = 360;
+		var l = 0;
+		var degry = 15;
+		var offset = 0;
+		var circleF = {
+			coordinateX : block * 2,
+			coordinateY : block * 2,
+		}
+		var map = {
+			0 : ["#","#","#","#","#","#","#",],
+			1 : ["#","_","_","_","_","_","#",],
+			2 : ["#","_","_","_","_","_","#",],
+			3 : ["#","_","_","_","_","_","#",],
+			4 : ["#","_","_","_","_","_","#",],
+			5 : ["#","#","#","#","#","#","#",],
+		};
+		var circle = function(color, x, y, radius) {
+			ctx.beginPath();
+			ctx.strokeStyle = color;
+			ctx.fillStyle = color;
+			ctx.arc(x, y, radius, 0, Math.PI*2, true);
+			ctx.fill();
+			ctx.stroke();
+		};
+		for (var i = 0; i < 6 * map[0].length; i++) {
+			if (map[y][x] === "#") {
+				ctx.fillStyle = "Black";
+				ctx.fillRect(x * block, y * block, block, block);
+				ctx.fillStyle = "Red";
+				ctx.fillRect(0, 0, 10, 10);
+			};
+			if (x === map[0].length - 1) {
+				y++
+				x = 0;
+			} else{
+				x++;
+			};
+		};
+		// console.log((block / 2) / (1 + Math.tan(l * Math.PI / 180)));
+		$("#map").click(function(event) {
+			console.log((event.pageX) + "X|Y" + (event.pageY));
+		});
+		circle("#61666A", circleF.coordinateX, circleF.coordinateY, block/2);
+		
+		var rayCast = function() {
+			ctx.strokeStyle = "Red";
+			ctx.lineWidth = 1;
+			offset  = 0;
+			for (var i = 0; i < arc / degry * 2; i++) {
+				// y = (block / 2) / (1 + Math.tan((l) * Math.PI / 180));
+				// x = Math.sqrt((block/2)*(block/2) - (y * y));
+				y = Math.sqrt(Math.pow(block / 2 , 2) / (1 + Math.pow(Math.tan((l) * Math.PI / 180), 2)));
+				x = Math.sqrt((block/2)*(block/2) - (y * y));
+				ctx.beginPath();
+				ctx.moveTo(circleF.coordinateX, circleF.coordinateY);
+				console.log(l);
+				if (offset === 0) {
+					ctx.lineTo((circleF.coordinateX + x), (circleF.coordinateY + y));
+				} else if (offset === 1) {
+					ctx.strokeStyle = "blue";
+					ctx.lineTo((circleF.coordinateX + y), (circleF.coordinateY - x));
+				} else if (offset === 2) {
+					ctx.strokeStyle = "green";
+					ctx.lineTo((circleF.coordinateX - x), (circleF.coordinateY - y));
+				} else if (offset === 3) {
+					ctx.strokeStyle = "yellow";
+					ctx.lineTo((circleF.coordinateX - y), (circleF.coordinateY + x));
+				};
+				ctx.stroke();
+				l = l + degry;
+				if (l >= 90) {
+					l = 0;
+					offset++;
+				};	
+			};
+		};
+		rayCast();
+	</script>
+</body>
+</html>

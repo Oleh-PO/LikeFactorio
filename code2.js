@@ -2,6 +2,7 @@ var map = document.getElementById("map")
 var ctx = map.getContext("2d");
 var block = 50;
 var tails = 39;
+var itemSelected = false;
 var inventorySelect;
 var camOffsetsX = 0;
 var camOffsetsY = 0;
@@ -12,6 +13,8 @@ var inventoryY = 350;
 var ironOreNumber = 15;
 var copperOreNumber = 5;
 var yOffsets = 0;
+var rayCastX = 0;
+var rayCastY = 0;
 var oreSelector;
 var gamePause = false;
 var inventoryOpen = false;
@@ -58,19 +61,9 @@ var player = {
 	y : 500,
 };
 player.inventory = {};
-player.inventory[1] = ["iron" ,1];
-player.inventory[1] = ["iron" ,1];
-player.inventory[2] = ["copper" ,1];
-player.inventory[3] = ["copper" ,1];
-player.inventory[4] = ["copper" ,1];
-player.inventory[5] = ["copper" ,1];
-player.inventory[6] = ["copper" ,1];
-player.inventory[7] = ["copper" ,1];
-player.inventory[8] = ["copper" ,1];
-player.inventory[9] = ["copper" ,1];
-player.inventory[10] = ["copper" ,1];
-player.inventory[11] = ["copper" ,1];
-
+for (var i = 0; i < 100; i++) {
+	player.inventory[i] = 0;
+};
 // player.inventory[0] = ["iron"];
 $("#map").click(function(event) { //click detector
 	var clickX = Math.floor((event.pageX + playerOffsetsX)/block);
@@ -85,7 +78,7 @@ $("#map").click(function(event) { //click detector
 					var o = false;
 					var u = 0;
 					while (o !== true) {
-						if (player.inventory[u] === undefined) {
+						if (player.inventory[u] === 0) {
 							player.inventory[u] = [oreSelector ,1];
 							o = true;
 						} else if (player.inventory[u][0] === oreSelector) {
@@ -106,17 +99,30 @@ $("#map").click(function(event) { //click detector
 			if (clickX > inventoryY && clickY < inventoryY + 250) {
 				var blockClickX = Math.floor((clickX - inventoryX) / block);
 				var blockClickY = Math.floor((clickY - inventoryY) / block);
-				inventorySelect = blockClickX + blockClickY * 10;
-				console.log(player.inventory[inventorySelect]);
+				if (itemSelected === false) {
+					inventorySelect = blockClickX + blockClickY * 10;
+					console.log(player.inventory[inventorySelect]);
+					if(player.inventory[inventorySelect] !== 0) {
+						itemSelected = true;
+					};
+				} else if (player.inventory[blockClickX + blockClickY * 10] !== player.inventory[inventorySelect]) {
+					player.inventory[blockClickX + blockClickY * 10] = player.inventory[inventorySelect];
+					itemSelected = false;
+					player.inventory[inventorySelect] = 0;
+				} else {
+					itemSelected = false;
+				};
 			};
-		};
+		} else {
+			itemSelected = false;
+		}
 	};
 });
 $("body").keydown(function(event) { //keybord detector
 	if (gamePause === false) {
 		switch(event.keyCode) {
 			case 68:
-				if (player.x > block * 24 + block/2) {
+				if (player.x > block * 34 + block/2) {
 					camOffsetsX = camOffsetsX + 10;
 				} else {
 					player.x = player.x + 10;
@@ -212,6 +218,28 @@ var inventory = function() { //inventory criator
 	};
 	// circle("#b87333", inventoryX + block/2 + block*i, inventoryY + block/2, block/3);
 };
+var rayCast = function(drow) {
+	rayCastY = 0;
+	ctx.strokeStyle = "Black";
+	ctx.lineWidth = 5;
+	ctx.beginPath();
+	ctx.moveTo(player.x + block/2, player.y);
+	for (var i = 0; i < 20; i++) {
+		ctx.lineTo(player.x + block/2, player.y - rayCastY);
+		// if (inventoryOpen === true) {
+			// console.log(blockMapX[Math.floor((player.x + block/2) / block) + blockOffsetsX][Math.floor((player.y - rayCastY) / block + blockOffsetsY)]);
+			// console.log(Math.floor((player.x + block/2) / block) + blockOffsetsX + "_|_" + Math.floor((player.y - rayCastY) / block + blockOffsetsY));
+		// };
+		var test = blockMapX[Math.floor((player.x + block/2) / block) + blockOffsetsX][Math.floor((player.y - rayCastY) / block + blockOffsetsY)];
+		if (test === "iron") {
+			ctx.stroke();
+			return rayCastY;
+		} else {
+			rayCastY = rayCastY + 10;
+		};
+	};
+	ctx.stroke();
+};
 var mapGenerator =  function() {
 	for (var i = 0; i < tails*2; i++) {
 		blockMapX[i] = {};
@@ -295,6 +323,7 @@ setInterval(function() {
 		mapBilder();
 		ctx.fillStyle = player.color;
 		ctx.fillRect(player.x, player.y, block, block);
+		// rayCast();
 	};
 	if (inventoryOpen === true) {
 		inventory();
