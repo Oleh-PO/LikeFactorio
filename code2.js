@@ -150,6 +150,7 @@ $("body").keydown(function(event) { //keybord detector
 				};
 				break;
 			case 32:
+			itemSelected = false;
 				if (inventoryOpen === false) {
 					inventoryOpen = true;
 				} else {

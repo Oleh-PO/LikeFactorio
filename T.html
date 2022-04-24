@@ -4,7 +4,7 @@
 	<title>LikeFactorio</title>
 </head>
 <body>
-	<canvas id="map" width="2000" height="1000"></canvas>
+	<canvas id="map" width="1710" height="1000"></canvas>
 	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 	<style type="text/css">
 		body {
@@ -14,15 +14,17 @@
 	<script>
 		var map = document.getElementById("map")
 		var ctx = map.getContext("2d");
-		var block = 100;
+		var block = 50;
 		var x = 0;
 		var y = 0;
 		var RayX = 0;
 		var RayY = 0;
-		var arc = 360;
+		var arc = 90;
 		var l = 0;
+		var length;
 		var degry = 1;
 		var offset = 0;
+		var monitor;
 		var circleF = {
 			coordinateX : 200,
 			coordinateY : 200,
@@ -71,7 +73,8 @@
 		var rayCast = function() {
 			// ctx.strokeStyle = "Red";
 			ctx.lineWidth = 2;
-			offset  = 0;
+			l = 0;
+			// offset  = 0;
 			for (var i = 0; i < arc / degry; i++) {
 				y = Math.sqrt(Math.pow(block / 5 , 2) / (1 + Math.pow(Math.tan((l) * Math.PI / 180), 2)));
 				x = Math.sqrt((block/5)*(block/5) - (y * y));
@@ -79,7 +82,8 @@
 				ctx.moveTo(circleF.coordinateX, circleF.coordinateY);
 				RayY = Math.sqrt(Math.pow(1, 2) / (1 + Math.pow(Math.tan((l) * Math.PI / 180), 2)));
 				RayX = Math.sqrt(Math.pow(1, 2) - Math.pow(RayY, 2));
-				if (offset === 0) {
+				switch(offset) {
+				case 0 :
 					ctx.strokeStyle = "Red";
 					ctx.lineTo((circleF.coordinateX + x), (circleF.coordinateY + y));
 					for (var o = 0; o < 200; o++) {
@@ -88,6 +92,11 @@
 						// if ((map[mapY])[mapX] === "#") {
 						// 	ctx.fillRect(circleF.coordinateX + RayX + x,circleF.coordinateY + RayY + y, 10, 10);
 						// };
+						if ((map[mapY])[mapX] === "#") {
+							monitor = 1710 / 90;
+							length = Math.sqrt(Math.pow(x , 2) + Math.pow(y, 2)) / 100;
+							ctx.fillRect(monitor * l, 450 - ((150 / length) / 2), monitor, 150 / length);
+						};
 						if ((map[mapY])[mapX] === "_") {
 							ctx.strokeStyle = "Red";
 							ctx.lineTo((circleF.coordinateX + RayX + x), (circleF.coordinateY + RayY + y));
@@ -95,7 +104,8 @@
 							y = y + RayY;
 						};
 					};
-				} else if (offset === 1) {
+					break;
+				 case 1 :
 					ctx.strokeStyle = "blue";
 					ctx.lineTo((circleF.coordinateX + y), (circleF.coordinateY - x));
 					for (var o = 0; o < 200; o++) {
@@ -104,13 +114,19 @@
 						// if ((map[mapY])[mapX] === "#") {
 						// 	ctx.fillRect(circleF.coordinateX + RayY + y ,circleF.coordinateY - RayX - x, 10, -10);
 						// };
+						if ((map[mapY])[mapX] === "#") {
+							monitor = 1710 / 89;
+							length = Math.sqrt(Math.pow(x , 2) + Math.pow(y, 2)) / 100;
+							ctx.fillRect(monitor * (89 - l), 450 - ((150 / length) / 2), monitor, 150 / length);
+						};
 						if ((map[mapY])[mapX] === "_") {
 							ctx.lineTo((circleF.coordinateX + RayY + y), (circleF.coordinateY - RayX - x));
 							x = x + RayX;
 							y = y + RayY;
 						};
 					};
-				} else if (offset === 2) {
+					break;
+				case 2 :
 					ctx.strokeStyle = "green";
 					ctx.lineTo((circleF.coordinateX - x), (circleF.coordinateY - y));
 					for (var o = 0; o < 200; o++) {
@@ -119,13 +135,19 @@
 						// if ((map[mapY])[mapX] === "#") {
 						// 	ctx.fillRect(circleF.coordinateX - RayX - x, circleF.coordinateY - RayY - y, -10, -10);
 						// };
+						if ((map[mapY])[mapX] === "#") {
+							monitor = 1710 / 89;
+							length = Math.sqrt(Math.pow(x , 2) + Math.pow(y, 2)) / 100;
+							ctx.fillRect(monitor * (89 - l), 450 - ((150 / length) / 2), monitor, 150 / length);
+						};
 						if ((map[mapY])[mapX] === "_") {
 							ctx.lineTo((circleF.coordinateX - RayX - x), (circleF.coordinateY - RayY - y));
 							x = x + RayX;
 							y = y + RayY;
 						};
 					};
-				} else if (offset === 3) {
+					break;
+				case 3 :
 					ctx.strokeStyle = "yellow";
 					ctx.lineTo((circleF.coordinateX - y), (circleF.coordinateY + x));
 					for (var o = 0; o < 200; o++) {
@@ -134,22 +156,28 @@
 						// if ((map[mapY])[mapX] === "#") {
 						// 	ctx.fillRect(circleF.coordinateX - RayY - y, circleF.coordinateY + RayX + x, -10, 10);
 						// };
+						if ((map[mapY])[mapX] === "#") {
+							monitor = 1710 / 90;
+							length = Math.sqrt(Math.pow(x , 2) + Math.pow(y, 2)) / 100;
+							ctx.fillRect(monitor * l, 450 - ((150 / length) / 2), monitor, 150 / length);
+						};
 						if ((map[mapY])[mapX] === "_") {
 							ctx.lineTo((circleF.coordinateX - RayY - y), (circleF.coordinateY + RayX + x));
 							x = x + RayX;
 							y = y + RayY;
 						};
 					};
+					break;
 				};
 				ctx.stroke();
 				l = l + degry;
 				if (l >= 90) {
 					l = 0;
-					offset++;
+					// offset++;
 				};	
 			};
 		};
-		$("body").keydown(function(event) { //keybord detector
+		$("body").keydown(function(event) { //keybord detector33
 				switch(event.keyCode) {
 					case 68:
 						 circleF.coordinateX = circleF.coordinateX + 10;
@@ -162,6 +190,18 @@
 						break;
 					case 87:
 						 circleF.coordinateY = circleF.coordinateY - 10;
+						break;
+					case 49:
+						offset = 0;
+						break;
+					case 50:
+						offset = 1;
+						break;
+					case 51:
+						offset = 2;
+						break;
+					case 52:
+						offset = 3;
 						break;
 					};
 		});
