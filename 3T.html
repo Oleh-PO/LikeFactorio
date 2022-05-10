@@ -27,6 +27,7 @@ var degry = 1;
 var offset = 0;
 var rotation = 0;
 var monitor;
+var monitorL;
 var circleF = {
 	coordinateX : 200,
 	coordinateY : 200,
@@ -36,8 +37,8 @@ var mapY = 0;
 var map = {
 	0 : ["#","#","#","#","#","#","#","#","#","#","#","#","#","#"],
 	1 : ["#","_","_","_","_","_","#","_","_","_","_","_","_","#"],
-	2 : ["#","_","_","#","#","_","#","#","#","#","#","#","_","#"],
-	3 : ["#","_","#","#","_","_","_","_","_","_","_","#","_","#"],
+	2 : ["#","_","#","#","#","_","#","#","#","#","#","#","_","#"],
+	3 : ["#","_","#","_","_","_","_","_","_","_","_","#","_","#"],
 	4 : ["#","_","_","_","_","_","#","#","_","#","_","_","_","#"],
 	5 : ["#","#","#","#","#","#","#","#","#","#","#","#","#","#"],
 };
@@ -89,13 +90,7 @@ var rayCastF = function (xRF, xF, yRF, yF) {
 			} else {
 			ctx.fillStyle = "#3c4042";
 			};
-			if(offset === 0){
-				ctx.fillRect(monitor * l, 450 - ((150 / length) / 2), monitor, 150 / length);
-			} else if (offset === 1) {
-				ctx.fillRect(monitor * (l + (90 - lF)), 450 - ((150 / length) / 2), monitor, 150 / length);
-			} else if (offset === 2) {
-				ctx.fillRect(monitor * l, 450 - ((150 / length) / 2), monitor, 150 / length);
-			};
+			ctx.fillRect(monitor * monitorL, 450 - ((150 / length) / 2), monitor, 150 / length);
 		};
 		if ((map[mapY])[mapX] === "_") {
 			ctx.lineTo((circleF.coordinateX + xRF + x), (circleF.coordinateY + yRF + y));
@@ -103,93 +98,58 @@ var rayCastF = function (xRF, xF, yRF, yF) {
 			y = y + yRF;
 		};
 	};
+	monitorL++;
 };
 var floorRender = function() {
 	ctx.fillStyle = "DarkGray";
 	ctx.fillRect(0, 450, 1920, 550);
 };
 var rayCast = function() {
+	offset = 0;
 	ctx.lineWidth = 2;
-	l = 0;
-	// offset = 0;
-	// console.log(Math.floor(rotation / arc));
-	offset = Math.floor(rotation / arc);
-	lF = rotation - offset * arc;
-	for (var i = 0; i < arc / degry; i++) {
-		// console.log(l + lF);
-		switch(offset) {
-		case 0 :
-			y = Math.sqrt(Math.pow(block / 5 , 2) / (1 + Math.pow(Math.tan((l + lF) * Math.PI / 180), 2)));
-			x = Math.sqrt((block/5)*(block/5) - (y * y));
-			ctx.beginPath();
-			ctx.moveTo(circleF.coordinateX, circleF.coordinateY);
-			RayY = Math.sqrt(Math.pow(1, 2) / (1 + Math.pow(Math.tan((l + lF) * Math.PI / 180), 2)));
-			RayX = Math.sqrt(Math.pow(1, 2) - Math.pow(RayY, 2));
+	monitorL = 0;
+	// console.log(rotation);
+	l = rotation;
+	for (var i = 0; i < 90; i++) {
+		y = Math.sqrt(Math.pow(block / 5 , 2) / (1 + Math.pow(Math.tan((l) * Math.PI / 180), 2)));
+		x = Math.sqrt((block/5)*(block/5) - (y * y));
+		ctx.beginPath();
+		ctx.moveTo(circleF.coordinateX, circleF.coordinateY);
+		RayY = Math.sqrt(Math.pow(1, 2) / (1 + Math.pow(Math.tan((l) * Math.PI / 180), 2)));
+		RayX = Math.sqrt(Math.pow(1, 2) - Math.pow(RayY, 2));
+		// console.log(l);
+		if (l > 270) {
+			offset = 3;
+		} else if (l > 180) {
+			console.log(true);
+			offset = 2;
+		} else if (l > 90) {
+			offset = 1;
+		} else {
+			offset = 0;
+		};
+		if (l > 360) {
+			offset = 0;
+			l = 0;
+		};
+		if (rotation > 360) {
+			rotation = 0;
+		}
+		if (offset === 0) {
 			ctx.strokeStyle = "Red";
 			rayCastF(RayX, x, RayY, y);
-			break;
-		 case 1 :
-		 if (rotation < 90) {
-				y = Math.sqrt(Math.pow(block / 5 , 2) / (1 + Math.pow(Math.tan((l) * Math.PI / 180), 2)));
-				x = Math.sqrt((block/5)*(block/5) - (y * y));
-				ctx.beginPath();
-				ctx.moveTo(circleF.coordinateX, circleF.coordinateY);
-				RayY = Math.sqrt(Math.pow(1, 2) / (1 + Math.pow(Math.tan((l) * Math.PI / 180), 2)));
-				RayX = Math.sqrt(Math.pow(1, 2) - Math.pow(RayY, 2));
-			} else {
-				y = Math.sqrt(Math.pow(block / 5 , 2) / (1 + Math.pow(Math.tan((l + lF) * Math.PI / 180), 2)));
-				x = Math.sqrt((block/5)*(block/5) - (y * y));
-				ctx.beginPath();
-				ctx.moveTo(circleF.coordinateX, circleF.coordinateY);
-				RayY = Math.sqrt(Math.pow(1, 2) / (1 + Math.pow(Math.tan((l + lF) * Math.PI / 180), 2)));
-				RayX = Math.sqrt(Math.pow(1, 2) - Math.pow(RayY, 2));
-			};
-			ctx.strokeStyle = "blue";
-			rayCastF(RayY, y, -RayX, -x);
-			break;
-		case 2 :
-			// console.log(1);
-			// if (rotation < 180) {
-				y = Math.sqrt(Math.pow(block / 5 , 2) / (1 + Math.pow(Math.tan((l) * Math.PI / 180), 2)));
-				x = Math.sqrt((block/5)*(block/5) - (y * y));
-				ctx.beginPath();
-				ctx.moveTo(circleF.coordinateX, circleF.coordinateY);
-				RayY = Math.sqrt(Math.pow(1, 2) / (1 + Math.pow(Math.tan((l) * Math.PI / 180), 2)));
-				RayX = Math.sqrt(Math.pow(1, 2) - Math.pow(RayY, 2));
-			// } else {
-				// y = Math.sqrt(Math.pow(block / 5 , 2) / (1 + Math.pow(Math.tan((l + lF) * Math.PI / 180), 2)));
-				// x = Math.sqrt((block/5)*(block/5) - (y * y));
-				// ctx.beginPath();
-				// ctx.moveTo(circleF.coordinateX, circleF.coordinateY);
-				// RayY = Math.sqrt(Math.pow(1, 2) / (1 + Math.pow(Math.tan((l + lF) * Math.PI / 180), 2)));
-				// RayX = Math.sqrt(Math.pow(1, 2) - Math.pow(RayY, 2));
-			// };
-			ctx.strokeStyle = "green";
+		} else if (offset === 1) {
+			ctx.strokeStyle = "Blue";
+			rayCastF(RayX, x, -RayY, -y);
+		} else if(offset === 2) {
+			ctx.strokeStyle = "Green";
 			rayCastF(-RayX, -x, -RayY, -y);
-			break;
-		case 3 :
-			ctx.strokeStyle = "yellow";
-			rayCastF(-RayY, -y, RayX, x);
-			break;
+		} else if (offset = 3) {
+			ctx.strokeStyle = "Yellow";
+			rayCastF(-RayX, -x, RayY, y);
 		};
-		ctx.stroke();
 		l = l + degry;
-		// console.log(offset);
-		// console.log(l);
-		if (l + lF >= 90 && offset === 0) {
-			l = 0;
-			offset++;
-		};
-		if (l + lF >= 170 && offset === 1) {
-			// console.log(true);
-			l = 0;
-			offset++;
-		};
-		if (l + lF >= 170 && offset === 0) {
-			// console.log(true);
-			l = 0;
-			offset++;
-		};
+		ctx.stroke();
 	};
 };
 $("body").keydown(function(event) { //keybord detector33
@@ -204,9 +164,18 @@ $("body").keydown(function(event) { //keybord detector33
 			if (rotation >= 0 && rotation < 45){
 				circleF.coordinateY = circleF.coordinateY - y;
 				circleF.coordinateX = circleF.coordinateX - x;
-			} else if (rotation >= 45) {
+			} else if (rotation >= 45 && rotation < 135){
+				// console.log(true);
 				circleF.coordinateY = circleF.coordinateY + y;
 				circleF.coordinateX = circleF.coordinateX - x;
+			} else if (rotation >= 135 && rotation < 225){
+				// console.log(true);
+				circleF.coordinateY = circleF.coordinateY + y;
+				circleF.coordinateX = circleF.coordinateX + x;
+			} else if (rotation >= 225 && rotation < 310){
+				// console.log(true);
+				circleF.coordinateY = circleF.coordinateY - y;
+				circleF.coordinateX = circleF.coordinateX + x;
 			};
 			break;
 		case 87:
@@ -214,10 +183,18 @@ $("body").keydown(function(event) { //keybord detector33
 			if (rotation >= 0 && rotation < 45){
 				circleF.coordinateY = circleF.coordinateY + y;
 				circleF.coordinateX = circleF.coordinateX + x;
-			} else if (rotation >= 45){
+			} else if (rotation >= 45 && rotation < 135){
 				// console.log(true);
 				circleF.coordinateY = circleF.coordinateY - y;
 				circleF.coordinateX = circleF.coordinateX + x;
+			} else if (rotation >= 135 && rotation < 225){
+				// console.log(true);
+				circleF.coordinateY = circleF.coordinateY - y;
+				circleF.coordinateX = circleF.coordinateX - x;
+			} else if (rotation >= 225 && rotation < 360){
+				// console.log(true);
+				circleF.coordinateY = circleF.coordinateY + y;
+				circleF.coordinateX = circleF.coordinateX - x;
 			};
 			break;
 		case 49:
@@ -248,10 +225,7 @@ $("body").keydown(function(event) { //keybord detector33
 	circle("#61666A", circleF.coordinateX, circleF.coordinateY, block/5);
 	floorRender();
 	rayCast();
-},100)
- // setInterval(function(){
- // 	lF++;
- // }, 100);
+},16)
 </script>
 </body>
 </html>
