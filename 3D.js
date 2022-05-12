@@ -54,7 +54,6 @@ var render = function() {
 		};
 	};
 };
-
 $("#map").click(function(event) {
 	// console.log((event.pageX) + "X|Y" + (event.pageY));
 	// console.log(offset);
@@ -64,9 +63,9 @@ var rayCastF = function (xRF, xF, yRF, yF) {
 	y = yF;
 	ctx.lineTo((circleF.coordinateX + xF), (circleF.coordinateY + yF));
 	for (var o = 0; o < 300; o++) {
-		mapY = Math.floor((circleF.coordinateY + yRF + y) / block);
-		mapX = Math.floor((circleF.coordinateX + xRF + x) / block);
-		if ((map[mapY])[mapX] === "#") {
+		mapY = Math.floor((circleF.coordinateY + yRF + y));
+		mapX = Math.floor((circleF.coordinateX + xRF + x));
+		if (mapTest(mapX, mapY) === false) {
 			monitor = 1920 / 90;
 			length = Math.sqrt(Math.pow(x , 2) + Math.pow(y, 2)) / 100;
 			if (length < 1.6) {
@@ -78,7 +77,7 @@ var rayCastF = function (xRF, xF, yRF, yF) {
 			};
 			ctx.fillRect(monitor * monitorL, 450 - ((150 / length) / 2), monitor, 150 / length);
 		};
-		if ((map[mapY])[mapX] === "_") {
+		if (mapTest(mapX, mapY) === true) {
 			ctx.lineTo((circleF.coordinateX + xRF + x), (circleF.coordinateY + yRF + y));
 			x = x + xRF;
 			y = y + yRF;

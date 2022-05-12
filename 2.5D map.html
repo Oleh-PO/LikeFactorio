@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>LikeFactorio</title>
+</head>
+<body>
+<canvas id="map" width="1920" height="975"></canvas>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script type="text/javascript" src="jopa.js"></script>
+<script>
+	var mapCanvas = document.getElementById("map")
+	var ctx = mapCanvas.getContext("2d");
+	var triangleXY;
+	var sin;
+	var point = [];
+	var x;
+	var y;
+	var mapY = {};
+	var map = [];
+	var pixelMap = {};
+	var block = 100;
+	ctx.lineWidth = 2;
+	// for (var i = 0; i < 1000; i++) {
+	// 	pixelMap[i] = [null];
+	// };
+	var triangle = function(oneX, oneY, twoX, twoY, threeX,  threeY){
+		x = oneX;
+		y = oneY;
+		// ctx.beginPath();
+		// ctx.moveTo(oneX, oneY);
+		sin = Math.abs(oneY - twoY) / Math.sqrt(Math.pow(Math.abs(oneY - twoY), 2) + Math.pow(Math.abs(oneX - twoX), 2));
+		for (var i = 0; i < 1000; i++) {
+			if (oneX - twoX < 0) {
+				x = x + Math.sqrt(1 - sin * sin);
+			} else {
+				x = x - Math.sqrt(1 - sin * sin);
+			};
+			if (oneY - twoY < 0) {
+				y = y + 1 * sin;
+			} else {
+				y = y - 1 * sin;
+			};
+			if (Math.floor(x) === twoX) {
+				i = 10000;
+			};
+			console.log(Math.floor(x) + "X|Y" + Math.floor(y));
+			if (pixelMap[Math.floor(x)] === undefined) {
+				console.log(true);
+				mapY[Math.floor(y)] = "#";
+				pixelMap[Math.floor(x)] = mapY;
+				mapY[Math.floor(y + 1)] = "#";
+				pixelMap[Math.floor(x)] = mapY;
+				mapY[Math.floor(y)] = "#";
+				pixelMap[Math.floor(x + 1)] = mapY;
+				mapY[Math.floor(y - 1)] = "#";
+				pixelMap[Math.floor(x)] = mapY;
+				mapY[Math.floor(y)] = "#";
+				pixelMap[Math.floor(x - 1)] = mapY;
+			};
+			
+			// ctx.lineTo(x, y);
+			ctx.fillRect(x, y, 1, 1);
+			ctx.fillRect(x + 1, y, 1, 1);
+			ctx.fillRect(x, y + 1, 1, 1);
+			ctx.fillRect(x - 1, y, 1, 1);
+			ctx.fillRect(x, y - 1, 1, 1);
+			mapY = {};
+		};
+		ctx.strokeStyle = "Red";
+		// ctx.moveTo(oneX, oneY);
+		// ctx.lineTo(twoX, twoY);
+		// ctx.lineTo(oneX, twoY);
+		// ctx.lineTo(oneX, oneY);
+		ctx.fill();
+		ctx.stroke();
+	};
+	$("body").keydown(function(event) {
+		jopa();
+	});
+	$("#map").click(function(event) {
+		console.log((event.pageX) + "X|Y" + (event.pageY));
+		point.push(event.pageX);
+		point.push(event.pageY);
+		if (point.length === 4) {
+			triangle(point[0], point[1], point[2], point[3], point[4], point[5]);
+			triangleXY = {
+				one : [point[0], point[1]],
+				two : [point[2], point[3]],
+				// three : [point[4], point[5]],
+			};
+			map.push(triangleXY);
+			point = [];
+		};
+	});
+</script>
+<style type="text/css">
+	body {
+		margin: 0;
+	}
+</style>
+</body>
+</html>
