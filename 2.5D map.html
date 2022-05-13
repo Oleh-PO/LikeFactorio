@@ -23,7 +23,7 @@
 	// for (var i = 0; i < 1000; i++) {
 	// 	pixelMap[i] = [null];
 	// };
-	var triangle = function(oneX, oneY, twoX, twoY, threeX,  threeY){
+	var triangle = function(oneX, oneY, twoX, twoY){
 		x = oneX;
 		y = oneY;
 		// ctx.beginPath();
@@ -43,9 +43,16 @@
 			if (Math.floor(x) === twoX) {
 				i = 10000;
 			};
-			console.log(Math.floor(x) + "X|Y" + Math.floor(y));
+			// console.log(Math.floor(x) + "X|Y" + Math.floor(y));
 			if (pixelMap[Math.floor(x)] === undefined) {
-				console.log(true);
+					// console.log(true);
+					mapY[Math.floor(y)] = "#";
+					pixelMap[Math.floor(x)] = mapY;
+			} else if (pixelMap[Math.floor(x)][Math.floor(y)] === undefined) {
+				for (var o = 0; o < Object.keys(pixelMap[Math.floor(x)]).length; o++) {
+					mapY[Object.keys(pixelMap[Math.floor(x)])[o]] = "#";
+					// console.log(mapY[Object.keys(pixelMap[Math.floor(x)])[i]] + i);
+				};
 				mapY[Math.floor(y)] = "#";
 				pixelMap[Math.floor(x)] = mapY;
 				mapY[Math.floor(y + 1)] = "#";
@@ -56,8 +63,7 @@
 				pixelMap[Math.floor(x)] = mapY;
 				mapY[Math.floor(y)] = "#";
 				pixelMap[Math.floor(x - 1)] = mapY;
-			};
-			
+			}
 			// ctx.lineTo(x, y);
 			ctx.fillRect(x, y, 1, 1);
 			ctx.fillRect(x + 1, y, 1, 1);
@@ -78,11 +84,11 @@
 		jopa();
 	});
 	$("#map").click(function(event) {
-		console.log((event.pageX) + "X|Y" + (event.pageY));
+		// console.log((event.pageX) + "X|Y" + (event.pageY));
 		point.push(event.pageX);
 		point.push(event.pageY);
 		if (point.length === 4) {
-			triangle(point[0], point[1], point[2], point[3], point[4], point[5]);
+			triangle(point[0], point[1], point[2], point[3]);
 			triangleXY = {
 				one : [point[0], point[1]],
 				two : [point[2], point[3]],

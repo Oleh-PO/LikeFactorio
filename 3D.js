@@ -3,6 +3,8 @@ var ctx = map.getContext("2d");
 var block = 50;
 var x = 0;
 var y = 0;
+var xL = 0;
+var yL = 0;
 var RayX = 0;
 var RayY = 0;
 var arc = 90;
@@ -89,13 +91,29 @@ var floorRender = function() {
 	ctx.fillStyle = "DarkGray";
 	ctx.fillRect(0, 450, 1920, 550);
 };
+var rayCollision = function(xRF, yRF) {
+	xL = 0;
+	yL = 0;
+	for (var o = 0; o < 7; o++) {
+		mapY = Math.floor((circleF.coordinateY + 1 + yL));
+		mapX = Math.floor((circleF.coordinateX + 1 + xL));
+		if (mapTest(mapX, mapY) === false) {
+			length = Math.sqrt(Math.pow(xL , 2) + Math.pow(yL, 2)) / 100;
+			console.log(true);
+			return length;
+		};
+		if (mapTest(mapX, mapY) === true) {
+			xL = xL + 1;
+			yL = yL + 1;
+		};
+	};
+};
 var rayCast = function() {
 	offset = 0;
 	ctx.lineWidth = 2;
 	monitorL = 0;
-	// console.log(rotation);
 	l = rotation;
-	for (var i = 0; i < 90; i++) {
+	for (var i = 0; i < arc; i++) {
 		y = Math.sqrt(Math.pow(block / 5 , 2) / (1 + Math.pow(Math.tan((l) * Math.PI / 180), 2)));
 		x = Math.sqrt((block/5)*(block/5) - (y * y));
 		ctx.beginPath();
@@ -106,7 +124,6 @@ var rayCast = function() {
 		if (l > 270) {
 			offset = 3;
 		} else if (l > 180) {
-			console.log(true);
 			offset = 2;
 		} else if (l > 90) {
 			offset = 1;
@@ -120,6 +137,10 @@ var rayCast = function() {
 		if (rotation > 360) {
 			rotation = 0;
 		}
+		// rayCollision(1, 1);
+		// rayCollision(1, -1);
+		// rayCollision(-1, 1);
+		// rayCollision(-1, -1);
 		if (offset === 0) {
 			ctx.strokeStyle = "Red";
 			rayCastF(RayX, x, RayY, y);
