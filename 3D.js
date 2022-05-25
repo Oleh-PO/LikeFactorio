@@ -77,7 +77,8 @@ var rayCastF = function (xRF, xF, yRF, yF) {
 			} else {
 			ctx.fillStyle = "#3c4042";
 			};
-			ctx.fillRect(monitor * monitorL, 450 - ((150 / length) / 2), monitor, 150 / length);
+			ctx.fillRect(monitor * monitorL, 450 - ((150 / length) / 2), monitor + 0.75, 150 / length);
+			o = 300;
 		};
 		if (mapTest(mapX, mapY) === true) {
 			ctx.lineTo((circleF.coordinateX + xRF + x), (circleF.coordinateY + yRF + y));
@@ -94,17 +95,16 @@ var floorRender = function() {
 var rayCollision = function(xRF, yRF) {
 	xL = 0;
 	yL = 0;
-	for (var o = 0; o < 7; o++) {
+	for (var o = 0; o < 11; o++) {
 		mapY = Math.floor((circleF.coordinateY + 1 + yL));
 		mapX = Math.floor((circleF.coordinateX + 1 + xL));
 		if (mapTest(mapX, mapY) === false) {
 			length = Math.sqrt(Math.pow(xL , 2) + Math.pow(yL, 2)) / 100;
-			console.log(true);
-			return length;
+			return true;
 		};
 		if (mapTest(mapX, mapY) === true) {
-			xL = xL + 1;
-			yL = yL + 1;
+			xL = xL + xRF;
+			yL = yL + yRF;
 		};
 	};
 };
@@ -137,10 +137,6 @@ var rayCast = function() {
 		if (rotation > 360) {
 			rotation = 0;
 		}
-		// rayCollision(1, 1);
-		// rayCollision(1, -1);
-		// rayCollision(-1, 1);
-		// rayCollision(-1, -1);
 		if (offset === 0) {
 			ctx.strokeStyle = "Red";
 			rayCastF(RayX, x, RayY, y);
@@ -178,16 +174,16 @@ $("body").keydown(function(event) { //keybord detector33
 			};
 			break;
 		case 87:
-			if (rotation >= 0 && rotation < 45) {
+			if (rotation >= 0 && rotation < 45 && rayCollision(1, 1) !== true) {
 				circleF.coordinateY = circleF.coordinateY + y;
 				circleF.coordinateX = circleF.coordinateX + x;
-			} else if (rotation >= 45 && rotation < 135 ){
+			} else if (rotation >= 45 && rotation < 135 && rayCollision(1, -1) !== true){
 				circleF.coordinateY = circleF.coordinateY - y;
 				circleF.coordinateX = circleF.coordinateX + x;
-			} else if (rotation >= 135 && rotation < 225) {
+			} else if (rotation >= 135 && rotation < 225 && rayCollision(-1, 1) !== true) {
 				circleF.coordinateY = circleF.coordinateY - y;
 				circleF.coordinateX = circleF.coordinateX - x;
-			} else if (rotation >= 225 && rotation < 360) {
+			} else if (rotation >= 225 && rotation < 360 && rayCollision(-1, -1) !== true) {
 				circleF.coordinateY = circleF.coordinateY + y;
 				circleF.coordinateX = circleF.coordinateX - x;
 			};
@@ -216,7 +212,7 @@ $("body").keydown(function(event) { //keybord detector33
 });
  setInterval(function() {
  	ctx.clearRect(0, 0, 2000, 1000);
-	render();
+	// render();
 	circle("#61666A", circleF.coordinateX, circleF.coordinateY, block/5);
 	floorRender();
 	rayCast();
