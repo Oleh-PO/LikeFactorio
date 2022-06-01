@@ -4189,6 +4189,9 @@ var recet = function() {
   };
 };
 recet();
+var jopa = function () {
+  console.log(pixelMap);
+};
 var renderPlayer = function(player) {
   for (var i = 0; i < 360; i++) {
     y = Math.sqrt(1 / (1 + Math.pow(Math.tan((i) * Math.PI / 180), 2)));

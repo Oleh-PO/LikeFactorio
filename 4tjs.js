@@ -2,7 +2,6 @@ var map = document.getElementById("map")
 var ctx = map.getContext("2d");
 var block = 50;
 var seeLenght = 6;
-var rotation = 0;
 var arc = 90;
 var degry = 1;
 var multiplayer = 2;
@@ -29,6 +28,7 @@ var player = function (color, radius, number) {
 	this.rotation = 0;
 	this.L = this.rotation;
 	this.id = number;
+	this.hp = 20;
 };
 player.prototype.drowplayer = function() {
 	ctx.beginPath();
@@ -36,6 +36,18 @@ player.prototype.drowplayer = function() {
 	ctx.fillStyle = this.color;
 	ctx.arc(this.x, this.y, this.radius, 0, Math.PI*2, true);
 	ctx.fill();
+	ctx.stroke();
+	ctx.fillRect((monitor * 90) * (this.id - 1), 100, this.hp * block, block);
+	this.drowSight();
+};
+player.prototype.drowSight = function () {
+	ctx.strokeStyle = "Black";
+	ctx.lineWidth = 2;
+	ctx.beginPath();
+	ctx.moveTo((monitor * arc / 2) + (monitor * arc * (this.id - 1)) - block / 2.5, 450);
+	ctx.lineTo((monitor * arc / 2) + (monitor * arc * (this.id - 1)) + block / 2.5, 450);
+	ctx.moveTo((monitor * arc / 2) + (monitor * arc * (this.id - 1)), 450 - block / 2.5);
+	ctx.lineTo((monitor * arc / 2) + (monitor * arc * (this.id - 1)), 450 + block / 2.5);
 	ctx.stroke();
 };
 player.prototype.ray = function (L, color) {
@@ -59,17 +71,18 @@ player.prototype.ray = function (L, color) {
 		} else {
 			length = Math.sqrt(Math.pow(x * o, 2) + Math.pow(y * o, 2)) / 100;
 			ctx.stroke();
-			whatIlook(Math.floor(this.x + x * this.radius + x * o), Math.floor(this.y + y * this.radius + y * o), length);
-			return length;
+			// whatIlook(Math.floor(this.x + x * this.radius + x * o), Math.floor(this.y + y * this.radius + y * o), length);
+			return [length, whatIlook(Math.floor(this.x + x * this.radius + x * o), Math.floor(this.y + y * this.radius + y * o), length)];
 		};
 	};
 	ctx.stroke();
+	return [undefined, undefined];
 };
 var one = new player("Red", block/5, 1);
 var two = new player("Blue", block/5, 2);
 player.prototype.rayCast = function () {
 	for (var i = 0; i < (arc / degry); i++) {
-		length = this.ray(this.L, this.color);
+		length = this.ray(this.L, this.color)[0];
 		// if (length < 1.6) {
 		// 		ctx.fillStyle = "#61666A";
 		// } else if (length < 2.6) {
@@ -88,8 +101,31 @@ player.prototype.rayCast = function () {
 	};
 	this.L = this.rotation;
 };
+player.prototype.shoot = function (player) {
+	renderPlayer(player);
+	// console.log(this.ray(this.rotation + arc / 2, "Magenta")[1]);
+	if (this.ray(this.rotation + arc / 2, "Magenta")[1] === player.id) {
+		player.hp--;
+		if (player.hp <= 0) {
+			alert(player.id + " lose!");
+			player.hp = 20;
+			player.x = 200;
+			player.y = 200;
+			player.rotation = 0;
+			this.hp = 20;
+			this.x = 300;
+			this.y = 250;
+			this.rotation = 0;
+		};
+	};
+	recet();
+};
 player.prototype.move = function () {
-	if(this.ray(this.rotation + arc / 2, "Black") > this.radius / 100) {
+	renderPlayer(one);
+	if (multiplayer > 1) {
+		renderPlayer(two);
+	};
+	if(this.ray(this.rotation + arc / 2, "Black")[0] > this.radius / 100) {
 		y = Math.sqrt(Math.pow(block / 10 , 2) / (1 + Math.pow(Math.tan((this.rotation + arc / 2) * Math.PI / 180), 2)));
 		x = Math.sqrt((block/10)*(block/10) - (y * y));
 		if (this.L + arc / 2 > 270) {
@@ -103,6 +139,7 @@ player.prototype.move = function () {
 		this.x = this.x + x;
 		this.y = this.y + y;
 	};
+	recet();
 };
 $("body").keydown(function(event) {
 	// console.log(event.keyCode);
@@ -119,6 +156,9 @@ $("body").keydown(function(event) {
 		case "d": 
 			one.rotation = one.rotation + 2;
 			break;
+		case "s":
+			one.shoot(two);
+			break;
 	};
 	if (multiplayer > 1) {
 		switch (key[event.keyCode]) {
@@ -134,6 +174,9 @@ $("body").keydown(function(event) {
 			case "->": 
 				two.rotation = two.rotation + 2;
 				break;
+			case "_":
+				two.shoot(one);
+				break;
 		};
 	};
 });
@@ -143,13 +186,13 @@ setInterval(function() {
 	if (multiplayer > 1) {
 		renderPlayer(two);
 	};
-	one.drowplayer();
 	one.rayCast();
+	one.drowplayer();
 	if (multiplayer > 1) {
-		two.drowplayer();
 		two.rayCast();
 		ctx.fillStyle = "Black";
-		ctx.fillRect(monitor * arc - 3, 0, 6, 1000);
+		ctx.fillRect(monitor * arc - 3, 0, 6, 1100);
+		two.drowplayer();
 	};
 	recet();
 	// one.rotation++;
