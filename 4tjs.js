@@ -3,15 +3,18 @@ var ctx = map.getContext("2d");
 var block = 50;
 var seeLenght = 6;
 var arc = 90;
-var degry = 1;
+var degry = 0.5;
+var height = 450;
 var multiplayer = 2;
-var monitor = ((1920) / (arc / degry)) / multiplayer;
+var width = 1920
+var monitor = ((width) / (arc / degry)) / multiplayer;
 var key = {
 	87 : "w",
 	68 : "d",
 	65 : "a",
 	83 : "s",
 	32 : "spase",
+	16 : "shift",
 	39 : "->",
 	37 : "<-",
 	38 : "^",
@@ -29,6 +32,7 @@ var player = function (color, radius, number) {
 	this.L = this.rotation;
 	this.id = number;
 	this.hp = 20;
+	this.vertically = 0;
 };
 player.prototype.drowplayer = function() {
 	ctx.beginPath();
@@ -37,17 +41,21 @@ player.prototype.drowplayer = function() {
 	ctx.arc(this.x, this.y, this.radius, 0, Math.PI*2, true);
 	ctx.fill();
 	ctx.stroke();
-	ctx.fillRect((monitor * 90) * (this.id - 1), 100, this.hp * block, block);
+	ctx.fillRect((width / multiplayer) * (this.id - 1), 100, this.hp * block, block);
 	this.drowSight();
 };
+player.prototype.drowFloor = function() {
+	ctx.fillStyle = "Grey";
+	ctx.fillRect((this.id -1) * width / multiplayer, height + this.vertically, monitor * arc / degry, height - this.vertically + 200);
+}
 player.prototype.drowSight = function () {
 	ctx.strokeStyle = "Black";
 	ctx.lineWidth = 2;
 	ctx.beginPath();
-	ctx.moveTo((monitor * arc / 2) + (monitor * arc * (this.id - 1)) - block / 2.5, 450);
-	ctx.lineTo((monitor * arc / 2) + (monitor * arc * (this.id - 1)) + block / 2.5, 450);
-	ctx.moveTo((monitor * arc / 2) + (monitor * arc * (this.id - 1)), 450 - block / 2.5);
-	ctx.lineTo((monitor * arc / 2) + (monitor * arc * (this.id - 1)), 450 + block / 2.5);
+	ctx.moveTo((width / multiplayer  / 2) + (width / multiplayer  * (this.id - 1))  - block / 2.5, 450);
+	ctx.lineTo((width / multiplayer  / 2) + (width / multiplayer  * (this.id - 1)) + block / 2.5, 450);
+	ctx.moveTo((width / multiplayer  / 2) + (width / multiplayer  * (this.id - 1)), 450 - block / 2.5);
+	ctx.lineTo((width / multiplayer  / 2) + (width / multiplayer  * (this.id - 1)), 450 + block / 2.5);
 	ctx.stroke();
 };
 player.prototype.ray = function (L, color) {
@@ -83,14 +91,7 @@ var two = new player("Blue", block/5, 2);
 player.prototype.rayCast = function () {
 	for (var i = 0; i < (arc / degry); i++) {
 		length = this.ray(this.L, this.color)[0];
-		// if (length < 1.6) {
-		// 		ctx.fillStyle = "#61666A";
-		// } else if (length < 2.6) {
-		// 		ctx.fillStyle = "#55595d";
-		// } else {
-		// 	ctx.fillStyle = "#3c4042";
-		// };
-		ctx.fillRect((monitor * i) + (monitor * arc) * (this.id - 1), 450 - ((150 / length) / 2), monitor + 0.9, 150 / length);
+		ctx.fillRect((monitor * i) + (width / multiplayer) * (this.id - 1), (height + this.vertically) - ((150 / length) / 2), monitor + 0.9, 150 / length);
 		this.L = this.L + degry;
 		if (this.L > 360) {
 			this.L = 0;
@@ -159,6 +160,12 @@ $("body").keydown(function(event) {
 		case "s":
 			one.shoot(two);
 			break;
+		case "spase":
+			one.vertically = one.vertically + 10;
+			break;
+		case "shift":
+			one.vertically = one.vertically - 10;
+			break;
 	};
 	if (multiplayer > 1) {
 		switch (key[event.keyCode]) {
@@ -182,8 +189,10 @@ $("body").keydown(function(event) {
 });
 setInterval(function() {
 	ctx.clearRect(0, 0, 3000, 1000);
+	one.drowFloor();
 	renderPlayer(one);
 	if (multiplayer > 1) {
+		two.drowFloor();
 		renderPlayer(two);
 	};
 	one.rayCast();
@@ -191,7 +200,7 @@ setInterval(function() {
 	if (multiplayer > 1) {
 		two.rayCast();
 		ctx.fillStyle = "Black";
-		ctx.fillRect(monitor * arc - 3, 0, 6, 1100);
+		ctx.fillRect((width / multiplayer) - 3, 0, 6, 1100);
 		two.drowplayer();
 	};
 	recet();

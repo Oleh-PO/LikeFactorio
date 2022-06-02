@@ -216,5 +216,5 @@ $("body").keydown(function(event) { //keybord detector33
 	circle("#61666A", circleF.coordinateX, circleF.coordinateY, block/5);
 	floorRender();
 	rayCast();
-	rotation++;
+	// rotation++;
 },16);
