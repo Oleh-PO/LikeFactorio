@@ -142,6 +142,21 @@ player.prototype.move = function () {
 	};
 	recet();
 };
+$("html").click(function (event) {
+	// console.log(event.pageX);
+	if (event.pageX > (width / 2) / multiplayer && event.pageX < width / 2) {
+		one.rotation++;
+	} else if (event.pageX < width / 2) {
+		one.rotation--;
+	};
+	if (multiplayer === 2 && event.pageX > width / 2) {
+		if (event.pageX > (width / 2) / multiplayer + width / 2) {
+			two.rotation++;
+		} else {
+			two.rotation--;
+		};
+	};
+});
 $("body").keydown(function(event) {
 	// console.log(event.keyCode);
 	switch (key[event.keyCode]) {
