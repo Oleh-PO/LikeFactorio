@@ -142,7 +142,7 @@ player.prototype.move = function () {
 	};
 	recet();
 };
-$("html").click(function (event) {
+$("html").mousemove(function (event) {
 	// console.log(event.pageX);
 	if (event.pageX > (width / 2) / multiplayer && event.pageX < width / 2) {
 		one.rotation++;
